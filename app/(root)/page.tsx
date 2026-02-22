@@ -5,6 +5,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="w-full bg-slate-50 dark:bg-[#0f172a] text-slate-600 dark:text-slate-300 py-24 flex flex-col gap-32 overflow-hidden transition-colors duration-300">
+
+      
       
       {/* SECTION 1: THE PROBLEM (Text Left, Image Right) */}
       <section className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
@@ -27,6 +29,13 @@ export default function Home() {
               </li>
             ))}
           </ul>
+          <Link 
+                href="/dashboard" 
+                className="px-8 py-4 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold hover:bg-slate-800 dark:hover:bg-slate-200 transition flex items-center justify-center gap-2 shadow-md"
+              >
+                Start Coding for Free
+                <ArrowRight className="w-5 h-5" />
+              </Link>
         </div>
         <div className="flex-1 w-full relative">
             <div className="aspect-square md:aspect-[4/3] relative rounded-2xl overflow-hidden shadow-xl dark:shadow-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-transparent">
@@ -37,6 +46,7 @@ export default function Home() {
                 className="object-cover"
                 />
             </div>
+            
         </div>
       </section>
 
