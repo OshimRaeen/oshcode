@@ -4,18 +4,45 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { TemplateFileTree } from "@/modules/playground/components/playground-explorer"
+import { useFileExplorer } from "@/modules/playground/hooks/useFileExplorer"
 import { usePlayground } from "@/modules/playground/hooks/usePlayground"
+import { TemplateFile } from "@/modules/playground/lib/path-to-json"
 import { useParams } from "next/navigation"
-import React from 'react'
+import React, { useEffect } from 'react'
 
 function MainDashboardPage() {
     const {id}=useParams<{id:string}>()
     const {playgroundData , templateData , isLoading , error , saveTemplateData} = usePlayground(id)
-    console.log("playgroundData" , playgroundData)
-    console.log("templateData" , templateData)
-    
-    const activeFile="sample.txt"
 
+    const {
+    setTemplateData,
+    setActiveFileId,
+    setPlaygroundId,
+    setOpenFiles,
+    activeFileId,
+    closeAllFiles,
+    closeFile,
+    openFile,
+    openFiles,
+
+  } = useFileExplorer();
+
+    useEffect(() => {
+    setPlaygroundId(id);
+  }, [id, setPlaygroundId]);
+
+  useEffect(() => {
+    if (templateData && !openFiles.length) {
+      setTemplateData(templateData);
+    }
+  }, [templateData, setTemplateData, openFiles.length]);
+    
+    
+    const activeFile=openFiles.find((file)=>file.id===activeFileId)
+    const hasUnsavedChanges = openFiles.some((file) => file.hasUnsavedChanges);
+    const handleFileSelect = (file: TemplateFile) => {
+        openFile(file);
+    }
 
   return (
     
@@ -23,7 +50,7 @@ function MainDashboardPage() {
         <>
         <TemplateFileTree
           data={templateData!}
-          onFileSelect={()=>{}}
+          onFileSelect={handleFileSelect}
           selectedFile={activeFile}
           title="File Explorer"
           onAddFile={()=>{}}
@@ -52,7 +79,8 @@ function MainDashboardPage() {
         </>
     </TooltipProvider>
 
-  )
+
+)
 }
 
 export default MainDashboardPage
