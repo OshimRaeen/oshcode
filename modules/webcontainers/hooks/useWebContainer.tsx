@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { WebContainer } from "@webcontainer/api";
 import { TemplateFolder } from "@/modules/playground/lib/path-to-json";
 
+// 1️⃣ Declare the boot promise OUTSIDE the hook so it survives React re-renders
+let webcontainerPromise: Promise<WebContainer> | null = null;
+
 interface UseWebContainerProps {
   templateData: TemplateFolder;
 }
@@ -28,7 +31,13 @@ export const useWebContainer = ({
 
     async function initializeWebContainer() {
       try {
-        const webcontainerInstance = await WebContainer.boot();
+        // 2️⃣ Check if it's already booting. If not, start it.
+        if (!webcontainerPromise) {
+          webcontainerPromise = WebContainer.boot();
+        }
+
+        // 3️⃣ Wait for the global promise to resolve
+        const webcontainerInstance = await webcontainerPromise;
 
         if (!mounted) return;
 
@@ -36,6 +45,10 @@ export const useWebContainer = ({
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to initialize WebContainer:", error);
+        
+        // If it fails, reset the promise so we can try again later
+        webcontainerPromise = null; 
+        
         if (mounted) {
           setError(
             error instanceof Error
@@ -51,9 +64,9 @@ export const useWebContainer = ({
 
     return () => {
       mounted = false;
-      if (instance) {
-        instance.teardown();
-      }
+      // ⚠️ DO NOT call instance.teardown() here!
+      // React Strict Mode will unmount/remount this instantly.
+      // Tearing it down here ruins the instance for the second mount.
     };
   }, []);
 
@@ -68,7 +81,7 @@ export const useWebContainer = ({
         const folderPath = pathParts.slice(0, -1).join("/");
 
         if (folderPath) {
-          await instance.fs.mkdir(folderPath, { recursive: true }); // Create folder structure recursively
+          await instance.fs.mkdir(folderPath, { recursive: true });
         }
 
         await instance.fs.writeFile(path, content);
@@ -82,13 +95,15 @@ export const useWebContainer = ({
     [instance]
   );
 
-  const destory = useCallback(()=>{
-    if(instance){
-        instance.teardown()
-        setInstance(null);
-        setServerUrl(null)
+  const destory = useCallback(() => {
+    if (instance) {
+      instance.teardown();
+      setInstance(null);
+      setServerUrl(null);
+      // 4️⃣ Reset the global promise so a completely new playground can boot later
+      webcontainerPromise = null; 
     }
-  },[instance])
+  }, [instance]);
 
-  return {serverUrl , isLoading , error , instance , writeFileSync , destory}
+  return { serverUrl, isLoading, error, instance, writeFileSync, destory };
 };
