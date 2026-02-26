@@ -22,6 +22,7 @@ import { useWebContainer } from "@/modules/webcontainers/hooks/useWebContainer"
 
 
 import { AlertCircle, Bot, FileText, FolderOpen, Save, Settings, X } from "lucide-react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from "sonner"
@@ -189,7 +190,7 @@ function MainDashboardPage() {
           updatedTemplateData.items
         );
 
-          // Sync with WebContainer
+            // Sync with WebContainer
         if (writeFileSync) {
           await writeFileSync(filePath, fileToSave.content);
           lastSyncedContent.current.set(fileToSave.id, fileToSave.content);
@@ -350,8 +351,16 @@ function MainDashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-1">
+                    <Link 
+                href="/dashboard" 
+                className="px-2 py-2 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900  hover:bg-slate-800 dark:hover:bg-slate-200 transition mr-6"
+                
+              >
+                Back To Dashboard
+                
+              </Link>
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <Button 
                                 size="sm"
                                 variant="outline"

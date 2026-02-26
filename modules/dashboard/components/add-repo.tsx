@@ -28,7 +28,7 @@ const AddRepo = () => {
 
       <div className="relative overflow-hidden">
         <Image
-          src={"/git.png"}
+          src={"/github.svg"}
           alt="Open GitHub repository"
           width={150}
           height={150}
