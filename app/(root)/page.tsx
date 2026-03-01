@@ -33,7 +33,7 @@ export default function Home() {
                 href="/dashboard" 
                 className="px-8 py-4 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold hover:bg-slate-800 dark:hover:bg-slate-200 transition flex items-center justify-center gap-2 shadow-md"
               >
-                Start Coding for Free
+                Get Started
                 <ArrowRight className="w-5 h-5" />
               </Link>
         </div>
