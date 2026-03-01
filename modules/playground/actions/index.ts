@@ -14,6 +14,8 @@ export const getPlaygroundById = async(id:string)=>{
             where:{id},
             select:{
                 title:true,
+                template: true,       // Make sure this is true!
+        customFiles: true,    // Make sure this is true!
                 templateFiles:{
                     select:{
                         content:true

@@ -19,6 +19,12 @@ import {
   Zap,
   Database,
   FlameIcon,
+  LogOut,
+  Monitor,
+  Moon,
+  Sun,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,9 +40,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
 import path from "path"
+import { useTheme } from "next-themes";
+import { signOut } from "next-auth/react"; 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
 // Define the interface for a single playground item, icon is now a string
 interface PlaygroundData {
@@ -60,6 +71,8 @@ const lucideIconMap: Record<string, LucideIcon> = {
 
 export function DashboardSidebar({ initialPlaygroundData }: { initialPlaygroundData: PlaygroundData[] }) {
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme();
+  const { toggleSidebar, state } = useSidebar()
   
   const starredPlaygrounds = initialPlaygroundData.filter((p) => p.starred);
   const recentPlaygrounds = initialPlaygroundData;
@@ -68,7 +81,7 @@ export function DashboardSidebar({ initialPlaygroundData }: { initialPlaygroundD
     <Sidebar variant="inset" collapsible="icon" className="border-1 border-r">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-3 justify-center">
-          <Image src={"/logo.svg"} alt="logo" height={60} width={60} />
+          <Image src={"/logo.svg"} alt="logo" height={100} width={100} />
         </div>
        
       </SidebarHeader>
@@ -171,7 +184,7 @@ export function DashboardSidebar({ initialPlaygroundData }: { initialPlaygroundD
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
@@ -180,6 +193,84 @@ export function DashboardSidebar({ initialPlaygroundData }: { initialPlaygroundD
                 <span>Settings</span>
               </Link>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter> */}
+      <SidebarFooter>
+        <SidebarMenu>
+          {/* 1. The Collapse Toggle Button */}
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={toggleSidebar} 
+              tooltip={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
+              className="cursor-pointer"
+            >
+              {state === "expanded" ? (
+                <PanelLeftClose className="h-4 w-4" />
+              ) : (
+                <PanelLeftOpen className="h-4 w-4" />
+              )}
+              {/* This text automatically hides when the sidebar collapses */}
+              <span>Collapse Sidebar</span> 
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          
+          <SidebarMenuItem>
+            <Popover>
+              <PopoverTrigger asChild>
+                <SidebarMenuButton tooltip="Settings" className="cursor-pointer">
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </SidebarMenuButton>
+              </PopoverTrigger>
+              
+              {/* side="right" makes it pop out next to the sidebar. 
+                  You can also try side="top" if you prefer it above the button! */}
+              <PopoverContent side="top" sideOffset={8} className="w-64 p-3 rounded-xl shadow-lg">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-sm font-semibold">Theme</span>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant={theme === "light" ? "default" : "ghost"} 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => setTheme("light")}
+                      >
+                        <Sun className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant={theme === "dark" ? "default" : "ghost"} 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => setTheme("dark")}
+                      >
+                        <Moon className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant={theme === "system" ? "default" : "ghost"} 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => setTheme("system")}
+                      >
+                        <Monitor className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border w-full" />
+
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Log out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

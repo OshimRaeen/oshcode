@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -5,108 +8,106 @@ import UserButton from "../auth/components/user-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Header() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 🚀 Manage all your links right here! Super easy to add/remove.
+  const navLinks = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Features", href: "/features", badge: "New" },
+    { name: "Templates", href: "/templates" },
+    { name: "Docs", href: "/docs" },
+   
+  ];
+
   return (
-    <>
-      <div className="sticky top-0 left-0 right-0 z-50">
-        <div className="bg-white dark:bg-[#0f172a]/4 w-full">
-          {/* Rest of the header content */}
-          <div className="flex items-center justify-center w-full flex-col">
-            <div
-              className={`
-                        flex items-center justify-between
-                        bg-linear-to-b from-white/90 via-gray-50/90 to-white/90
-                        dark:from-zinc-900/90 dark:via-zinc-800/90 dark:to-zinc-900/90
-                        shadow-[0_2px_20px_-2px_rgba(0,0,0,0.1)]
-                        backdrop-blur-md
-                        border-x border-b 
-                        border-[rgba(230,230,230,0.7)] dark:border-[rgba(70,70,70,0.7)]
-                        w-full sm:min-w-[800px] sm:max-w-[1200px]
-                        rounded-b-[28px]
-                        px-4 py-2.5
-                        relative
-                        transition-all duration-300 ease-in-out
-                        `}
+    <header
+      className={`
+        fixed left-1/2 -translate-x-1/2 z-50 
+        transition-all duration-500 ease-in-out 
+        flex items-center justify-between
+        ${
+          isScrolled
+            ? "top-4 w-[calc(100%-2rem)] max-w-5xl rounded-full border border-zinc-200/80 dark:border-zinc-800/80 bg-white/70 dark:bg-zinc-950/70 shadow-lg shadow-zinc-200/20 dark:shadow-black/40 backdrop-blur-lg px-4 py-2"
+            : "top-0 w-full max-w-full rounded-none border border-transparent border-b-zinc-200/80 dark:border-b-zinc-800/80 bg-white/95 dark:bg-zinc-950/95 shadow-none backdrop-blur-md px-6 py-3"
+        }
+      `}
+    >
+      {/* Left Section: Logo & Desktop Nav */}
+      <div className="flex items-center gap-6">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <Image
+            src={"/logo.svg"}
+            alt="Logo"
+            height={80}
+            width={80}
+            className={`transition-all duration-500 group-hover:scale-105 ${
+              isScrolled ? "scale-90" : "scale-100"
+            }`}
+          />
+          <span className="hidden sm:block font-bold text-lg tracking-tight text-zinc-900 dark:text-zinc-50">
+            OshCode
+          </span>
+        </Link>
+
+        {/* Elegant vertical divider - Hidden on mobile */}
+        <div className="hidden md:block h-5 w-px bg-zinc-300 dark:bg-zinc-800" />
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 rounded-full transition-all"
             >
-              <div className="relative z-10 flex items-center justify-between w-full gap-2">
-                {/* Logo Section with Navigation Links */}
-                <div className="flex items-center gap-6 justify-center">
-                  <Link
-                    href="/"
-                    className="flex items-center gap-2 justify-center"
-                  >
-                    <Image
-                      src={"/logo.svg"}
-                      alt="Logo"
-                      height={60}
-                      width={60}
-                    />
-
-                    <span className="hidden sm:block font-extrabold text-lg">
-                      OshCode
-                    </span>
-                  </Link>
-                  <span className="text-zinc-300 dark:text-zinc-700">|</span>
-                  {/* Desktop Navigation Links */}
-                  <div className="hidden sm:flex items-center gap-4">
-                    <Link
-                      href="/docs/components/background-paths"
-                      className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                    >
-                      Docs
-                    </Link>
-                    {/* <Link
-                                            href="/pricing"
-                                            className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                                        >
-                                            Pricing
-                                        </Link> */}
-                    <Link
-                      href="https://codesnippetui.pro/templates?utm_source=codesnippetui.com&utm_medium=header"
-                      target="_blank"
-                      className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors flex items-center gap-2"
-                    >
-                      API
-                      <span className="text-green-500 dark:text-green-400 border border-green-500 dark:border-green-400 rounded-lg px-1 py-0.5 text-xs">
-                        New
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Right side items */}
-                <div className="hidden sm:flex items-center gap-3">
-                  <span className="text-zinc-300 dark:text-zinc-700">|</span>
-                  {/* <HeaderPro /> */}
-                  <ThemeToggle/>
-                  {/* <ThemeToggle /> */}
-                  <UserButton/>
-                </div>
-
-                {/* Mobile Navigation remains unchanged */}
-                <div className="flex sm:hidden items-center gap-4">
-                  <Link
-                    href="/docs/components/action-search-bar"
-                    className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    Docs
-                  </Link>
-                  <Link
-                    href="/pricing"
-                    className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                  >
-                    API
-                  </Link>
-                  {/* <ThemeToggle /> */}
-                  <ThemeToggle/>
-                  <UserButton/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+              {link.name}
+              {/* Automatically renders a badge if you added one in the array above */}
+              {link.badge && (
+                <span className="flex items-center px-1.5 py-0.5 rounded-md bg-emerald-100/80 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                  {link.badge}
+                </span>
+              )}
+            </Link>
+          ))}
+        </nav>
       </div>
-    </>
+
+      {/* Right Section: Actions & Mobile Nav */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        
+        {/* Mobile Navigation (Only shows top 2 links to prevent crowding) */}
+        <nav className="flex md:hidden items-center gap-3 mr-2">
+          <Link
+            href="/dashboard"
+            className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/features"
+            className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors"
+          >
+            Features
+          </Link>
+        </nav>
+
+        <ThemeToggle />
+
+        {/* Elegant vertical divider before User Button */}
+        <div className="hidden sm:block h-5 w-px bg-zinc-300 dark:bg-zinc-800 mx-1" />
+
+        <UserButton />
+      </div>
+    </header>
   );
 }
-
-

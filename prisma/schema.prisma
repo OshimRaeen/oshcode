@@ -58,6 +58,7 @@ enum Templates {
   VUE
   HONO
   ANGULAR
+  GITHUB
 }
 model Playground {
   id  String @id @default(cuid()) @map("_id")
@@ -66,6 +67,7 @@ model Playground {
   template   Templates  @default(REACT)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime @updatedAt
+  customFiles Json?    // This will store the raw files from GitHub
  
  Starmark   StarMark[]
   userId  String
