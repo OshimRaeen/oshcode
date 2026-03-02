@@ -21,10 +21,41 @@ const Page = async () => {
           <EmptyState />
         ) : (
           <ProjectTable
-            projects={playgrounds || []}
+            projects={(playgrounds || []).map(p => ({ 
+              ...p, 
+              // 1. Fix the description (you already did this)
+              description: p.description || "", 
+              
+              // 2. Fix the user object (name and image might be null)
+              user: {
+                ...p.user,
+                name: p.user.name || "Anonymous Developer", // Fallback if no name exists
+                image: p.user.image || "",                  // Fallback if no profile pic exists
+              },
+
+              // 3. Fix the customFiles (fallback to an empty object if null)
+              customFiles: p.customFiles || {}, 
+            }))}
             onDeleteProject={deletePlaygroundById}
-            onUpdateProject={editPlaygroundById}
-            onDuplicateProject={duplicatePlaygroundById}
+            // --- FIX 1: Inject the missing 'template' property ---
+            onUpdateProject={async (id, data) => {
+              // Find the original project in our array so we know what template it used
+              const existingProject = playgrounds?.find((p) => p.id === id);
+              
+              if (existingProject) {
+                await editPlaygroundById(id, {
+                  title: data.title,
+                  description: data.description,
+                  // Pass the existing template back to the database to keep it happy
+                  template: existingProject.template as any, 
+                });
+              }
+            }}
+            // --- FIX 2: Swallow the return value to satisfy 'void' ---
+            onDuplicateProject={async (id) => {
+              await duplicatePlaygroundById(id);
+              // By not typing 'return await...', this function now correctly returns void
+            }}
           />
         )} 
       </div>
