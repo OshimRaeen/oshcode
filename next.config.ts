@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
       }
     ]
   },
+  // 1. THE FIX: Force Vercel to bundle your template files into the API routes
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./oshcode-starters/**/*"],
+  },
   async headers() {
     return [
       {
