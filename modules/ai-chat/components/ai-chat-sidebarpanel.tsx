@@ -512,18 +512,27 @@ export const AIChatSidePanel: React.FC<AIChatSidePanelProps> = ({
                                                     remarkPlugins={[remarkGfm, remarkMath]}
                                                     rehypePlugins={[rehypeKatex]}
                                                     components={{
-                                                        code: ({ children, className, inline }) => {
-                                                            if (inline) {
+                                                        code({ className, children, ...props }) {
+                                                            // Detect if it's a block by checking for a language class or newlines
+                                                            const match = /language-(\w+)/.exec(className || "");
+                                                            const isBlock = match || String(children).includes("\n");
+
+                                                            if (!isBlock) {
+                                                                // Render Inline Code
                                                                 return (
-                                                                    <code className="bg-zinc-800 px-1 py-0.5 rounded text-sm">
+                                                                    <code className="bg-zinc-800 px-1 py-0.5 rounded text-sm" {...props}>
                                                                         {children}
                                                                     </code>
                                                                 );
                                                             }
+
+                                                            // Render Block Code
                                                             return (
                                                                 <div className="bg-zinc-800 rounded-lg p-4 my-4">
                                                                     <pre className="text-sm text-zinc-100 overflow-x-auto">
-                                                                        <code className={className}>{children}</code>
+                                                                        <code className={className} {...props}>
+                                                                            {children}
+                                                                        </code>
                                                                     </pre>
                                                                 </div>
                                                             );

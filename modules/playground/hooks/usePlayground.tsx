@@ -116,12 +116,19 @@ export const usePlayground = (id: string): UsePlaygroundReturn => {
       // 2. NEW: Check if this is a GitHub import
       if (data?.template === "GITHUB") {
         if (data?.customFiles) {
-          // Build the tree if we have files
-          const isFlatArray = Array.isArray(data.customFiles) && data.customFiles.length > 0 && data.customFiles[0].path;
+          // 1. Tell TypeScript to treat this JSON as an array of 'any' objects first
+          const filesArray = data.customFiles as any[];
+         // 2. Safely check if it's a flat array (fixing the "possibly null" error)
+          const isFlatArray = 
+            Array.isArray(filesArray) && 
+            filesArray.length > 0 && 
+            filesArray[0] && 
+            typeof filesArray[0].path === "string";
           
+          // 3. Cast the data explicitly for the buildFileTree function OR the treeItems assignment
           const treeItems = isFlatArray 
-            ? buildFileTree(data.customFiles) 
-            : data.customFiles; 
+            ? buildFileTree(filesArray as { path: string; content: string }[]) 
+            : (filesArray as (TemplateFolder | TemplateFile)[]);
 
           setTemplateData({
             folderName: "Root",
