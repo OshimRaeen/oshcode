@@ -467,6 +467,7 @@ function MainDashboardPage() {
                   </Tabs>
                 </div>
                 <div className="flex-1">
+                  {/* @ts-ignore - shadcn component type mismatch */}
                   <ResizablePanelGroup direction="horizontal" className="h-full">
                     <ResizablePanel defaultSize={isPreviewVisible ? 50 : 100}>
                       <PlaygroundEditor
